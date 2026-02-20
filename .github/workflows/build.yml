@@ -41,10 +41,17 @@ jobs:
     name: Builds
     runs-on: ubuntu-22.04
     needs: get_default_envs
+    
     strategy:
       fail-fast: false
       matrix:
-        environment: ${{ fromJSON(needs.get_default_envs.outputs.environments) }}
+        environment:
+          - esp32S3_8MB_PSRAM_M_qspi
+          - esp32S3_8MB_PSRAM_M_opi
+          - esp32S3_16MB_PSRAM_M_HUB75
+          - esp32S3_WROOM-2_M
+          - esp32s3_8mb_psram_m_boya
+
     steps:
     - uses: actions/checkout@v4
     - name: Cache pip

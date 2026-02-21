@@ -22,5 +22,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sdkconfig-derived
-         path: .pio/build/esp32s3_8mb_psram_m_boya/sdkconfig.esp32s3_8mb_psram_m_boya
-         
+          path: .pio/build/esp32s3_8mb_psram_m_boya/sdkconfig.esp32s3_8mb_psram_m_boya
+

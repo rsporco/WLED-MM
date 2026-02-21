@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
+
     - name: Cache pip
       uses: actions/cache@v4
       with:
@@ -24,15 +25,19 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
+
     - uses: actions/setup-python@v5
       with:
         python-version: '3.9'
+
     - name: Install PlatformIO
       run: pip install -r requirements.txt
+
     - name: Get default environments
       id: envs
       run: |
         echo "environments=$(pio project config --json-output | jq -cr '.[0][1][0][1]')" >> $GITHUB_OUTPUT
+
     outputs:
       environments: ${{ steps.envs.outputs.environments }}
 
@@ -41,7 +46,7 @@ jobs:
     name: Builds
     runs-on: ubuntu-22.04
     needs: get_default_envs
-    
+
     strategy:
       fail-fast: false
       matrix:
@@ -53,7 +58,9 @@ jobs:
           - esp32s3_8mb_psram_m_boya
 
     steps:
+
     - uses: actions/checkout@v4
+
     - name: Cache pip
       uses: actions/cache@v4
       with:
@@ -61,38 +68,45 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
+
     - name: Cache PlatformIO
       uses: actions/cache@v4
       with:
         path: ~/.platformio
-        key: ${{ runner.os }}-${{ matrix.environment}}
+        key: ${{ runner.os }}-${{ matrix.environment }}
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-          python-version: '3.9'
+        python-version: '3.9'
+
     - name: Install PlatformIO
       run: pip install -r requirements.txt
+
     - name: Build firmware
       env:
         WLED_RELEASE: True
         WLED_NIGHTLY_BUILD: ${{ inputs.nightly_build && 'true' || 'false' }}
       run: pio run -e ${{ matrix.environment }}
-   
-    - name: Upload build log 
-      if: failure() 
+
+    # FIXED: correct variable name + always upload logs
+    - name: Upload build log
+      if: always()
       uses: actions/upload-artifact@v4
-      with: name: build-log-${{ matrix.env }}
-      path: .pio/build/${{ matrix.env }}/build.log
+      with:
+        name: build-log-${{ matrix.environment }}
+        path: .pio/build/${{ matrix.environment }}/build.log
 
     - name: Rename Bin
       run: mv -v .pio/build/${{ matrix.environment }}/firmware.bin firmware-${{ matrix.environment }}.bin
+
     - uses: actions/upload-artifact@v4
       with:
         name: firmware-${{ matrix.environment }}
         path: firmware-${{ matrix.environment }}.bin
+
     - uses: actions/upload-artifact@v4
       if: startsWith(github.ref, 'refs/tags/')
       with:
         name: firmware-release-${{ matrix.environment }}
         path: build_output/release/*.bin
-  

@@ -10,3 +10,17 @@ on:
 jobs:
   wled_build:
     uses: ./.github/workflows/build.yml
+
+  upload_sdkconfig:
+    runs-on: ubuntu-latest
+    needs: wled_build
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Upload sdkconfig
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdkconfig-derived
+          path: .pio/build/esp32s3_8mb_psram_m_boya/sdkconfig.esp32s3_8mb_psram_m_boyasp32s3_mb_psram_m_boya/sdkconfig.esp32s3_8mb_psram_m_boya
+

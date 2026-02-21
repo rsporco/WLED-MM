@@ -77,6 +77,13 @@ jobs:
         WLED_RELEASE: True
         WLED_NIGHTLY_BUILD: ${{ inputs.nightly_build && 'true' || 'false' }}
       run: pio run -e ${{ matrix.environment }}
+    - name: Upload build log
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+         name: build-log-${{ matrix.env }}
+         path: .pio/build/${{ matrix.env }}/build.log
+
     - name: Rename Bin
       run: mv -v .pio/build/${{ matrix.environment }}/firmware.bin firmware-${{ matrix.environment }}.bin
     - uses: actions/upload-artifact@v4

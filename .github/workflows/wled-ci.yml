@@ -1,11 +1,11 @@
 name: WLED CI
 
-on:
-  push:
-    branches:
-      - '*'
-  pull_request:
-  workflow_dispatch:
+on: 
+  push: 
+    branches: - mdev
+    pull_request: 
+      branches: - mdev 
+    workflow_dispatch:
 
 jobs:
   wled_build:
